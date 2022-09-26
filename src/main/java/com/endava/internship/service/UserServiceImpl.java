@@ -23,12 +23,14 @@ public class UserServiceImpl implements UserService {
                 .sorted(Collections.reverseOrder())
                 .collect(Collectors.toList());
     }
-
     @Override
     public List<User> sortByAgeDescAndNameAsc(final List<User> users) {
+        Comparator<User> compareAgeDescAndNameAsc =
+                Comparator.comparing(User::getAge).reversed()
+                        .thenComparing(User::getFirstName);
+
         return users.stream()
-                .sorted(Comparator.comparing(User::getAge).reversed()
-                        .thenComparing(User::getFirstName))
+                .sorted(compareAgeDescAndNameAsc)
                 .collect(Collectors.toList());
     }
 
@@ -43,9 +45,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUpdateUserWithAgeHigherThan(final List<User> users, final int age) {
+        Predicate<User> predicate =
+                user -> user.getAge() > age && user.getPrivileges().contains(Privilege.UPDATE);
+
         return users.stream()
-                .filter(user -> user.getAge() > age &&
-                        user.getPrivileges().contains(Privilege.UPDATE))
+                .filter(predicate)
                 .findAny();
     }
 
